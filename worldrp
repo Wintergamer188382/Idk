@@ -1,0 +1,597 @@
+----------------------script start-------------------------------
+
+--some functions--
+
+function Notify(tt, tx)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = tt,
+        Text = tx,
+        Duration = 4
+    })
+end
+
+--startup--
+
+if _G.ardour then
+    Notify("Ardour", "Script is already loaded")
+    return
+end
+_G.ardour = true
+
+print("starting ardour")
+
+print("checking exec")
+local exec = identifyexecutor()
+if string.match(exec, "Synapse") == nil and string.match(exec, "Macsploit") == nil and string.match(exec, "Seliware") == nil and string.match(exec, "Wave") == nil and string.match(exec, "Nihon") == nil and string.match(exec, "AWP") == nil then
+    Notify("Ardour", "Loading. Using " .. exec .. " (Not supported)")
+    Notify("WARNING", "We do not guarantee that the script will work on your injector!")
+else
+    Notify("Ardour", "Loading. Using " .. exec .. " (Supported)")
+end
+
+--variables--
+print("loading variables")
+
+local localplayer = game.Players.LocalPlayer
+local holdingm1 = false
+local scriptloading = true
+
+local killsolara = Instance.new("Sound", workspace)
+killsolara.Name = "KillSolaraSound"
+killsolara.SoundId = "rbxassetid://3292861902"
+
+local godcapture = {
+    enabled = false,
+    price = 0,
+    restore = false,
+    instacore = true,
+    clickspam = false,
+}
+local relgod = {
+    enabled = false,
+    waitcd = 0.5,
+    onlytarget = false,
+    targetplr = nil,
+    reltype = "Peace",
+    relbool = true,
+}
+local votegod = {
+    eracount = 0,
+    mapcount = 0
+}
+
+--god capture--
+print("loading god capture")
+
+local function godcapturefunc()
+    local v_u_1 = game:GetService("Players")
+    local v_u_2 = game:GetService("RunService")
+    local v_u_3 = game:GetService("ReplicatedStorage")
+    local v_u_4 = game:GetService("MarketplaceService")
+    local v_u_5 = game:GetService("UserInputService")
+    local v_u_6 = game:GetService("ContextActionService")
+    local v_u_7 = v_u_1.LocalPlayer
+    local v_u_8 = v_u_7:GetMouse()
+    local v_u_9 = v_u_7:WaitForChild("PlayerGui")
+    local v_u_10 = nil
+    local v_u_101 = nil
+    local v_u_11 = v_u_7.Backpack.PaintBucket
+    local v_u_12 = v_u_11:WaitForChild("Handle"):WaitForChild("PaintSound")
+    local v_u_13 = v_u_11.LocalScript:WaitForChild("PaletteGui")
+    local v14 = v_u_11:WaitForChild("Remotes")
+    local v_u_15 = v14:WaitForChild("ServerControls")
+    local v16 = v14:WaitForChild("ClientControls")
+    local v_u_17 = BrickColor.new("White").Color
+    local v_u_18 = nil
+    local v_u_19 = Instance.new("Highlight")
+    v_u_19.FillColor = v_u_17
+    v_u_19.OutlineTransparency = 1
+    v_u_19.Parent = v_u_9
+    local v_u_20 = {}
+    local v_u_21 = Instance.new("LineHandleAdornment")
+    v_u_21.Color3 = v_u_17
+    v_u_21.Thickness = 5
+    v_u_21.Parent = v_u_9
+    local v_u_22 = false
+    local v_u_23 = false
+    local v_u_24 = false
+    local v_u_25 = "Default"
+    local v_u_26 = 0
+    local v_u_27 = false
+
+    local v_u_37 = nil
+    local function SetupGui()
+        if v_u_18 then
+            v_u_18:Destroy()
+        end
+        v_u_18 = v_u_13:Clone()
+        local v38 = v_u_3.CurrentCountries:FindFirstChild(v_u_7.leaderstats.Country.Value).Value
+        v_u_37 = v_u_7.leaderstats.Country.Value
+        v_u_17 = v38
+        v_u_19.FillColor = v_u_17
+        v_u_21.Color3 = v_u_17
+        v_u_18.Color.BackgroundColor3 = v_u_17
+        local v39 = v_u_17.R * 255
+        local v40 = v_u_17.G * 255
+        local v41 = v_u_17.B * 255
+        local v42 = math.round(v39)
+        local v43 = math.round(v40)
+        local v44 = math.round(v41)
+        v_u_18.CashLabel.Text = "Paint Color: " .. v42 .. ", " .. v43 .. ", " .. v44
+        v_u_18.CLButton.MouseButton1Click:Connect(function()
+            v_u_7.PlayerGui.PaintListUI.Enabled = not v_u_7.PlayerGui.PaintListUI.Enabled
+        end)
+        v_u_18.Parent = v_u_9
+    end
+    local function UpdateSelectionBox()
+        if v_u_8 and v_u_8.Target and v_u_19 then
+            v_u_19.Adornee = v_u_8.Target
+            if v_u_21 and v_u_7.Character then
+                v_u_21.Adornee = v_u_7.Character.PrimaryPart
+                local v55 = v_u_7.Character.PrimaryPart.CFrame:pointToObjectSpace(v_u_8.Hit.p)
+                v_u_21.CFrame = CFrame.new(v_u_21.CFrame.p, v55)
+                v_u_21.Length = (v_u_8.Target.CFrame.p - v_u_7.Character.PrimaryPart.CFrame.p).Magnitude
+            end
+        end
+    end
+    for _, v_u_56 in pairs(v_u_3.CurrentCountries:GetChildren()) do
+        local v57 = v_u_3.PaletteTemp:Clone()
+        v57.Parent = v_u_9.PaintListUI.CL.ScrollingFrame
+        v57.Name = v_u_56.Name
+        v57.CashLabel.Text = v_u_56:GetAttribute("CustomName") or v_u_56.Name
+        v57.Frame.Image = "rbxthumb://type=Asset&id=" .. v_u_56:GetAttribute("FlagID") .. "&w=768&h=432"
+        v57.Color.BackgroundColor3 = v_u_56.Value
+        v57.GetColor.MouseButton1Click:Connect(function()
+            local v58 = v_u_56.Value
+            v_u_37 = v_u_56.Name
+            v_u_17 = v58
+            v_u_19.FillColor = v_u_17
+            v_u_21.Color3 = v_u_17
+            v_u_18.Color.BackgroundColor3 = v_u_17
+            local v59 = v_u_17.R * 255
+            local v60 = v_u_17.G * 255
+            local v61 = v_u_17.B * 255
+            local v62 = math.round(v59)
+            local v63 = math.round(v60)
+            local v64 = math.round(v61)
+            v_u_18.CashLabel.Text = "Paint Color: " .. v62 .. ", " .. v63 .. ", " .. v64
+        end)
+    end
+    v_u_9.PaintListUI.CL.ExitButton.MouseButton1Click:Connect(function()
+        v_u_9.PaintListUI.Enabled = false
+    end)
+    v_u_15:InvokeServer("Setup", {})
+    for _, v65 in pairs(workspace.Territories:GetDescendants()) do
+        if v65:IsA("BasePart") and v65:GetAttribute("Core") == v_u_7.leaderstats.Country.Value then
+            table.insert(v_u_20, v65)
+        end
+    end
+    v_u_11.Equipped:Connect(function(p_u_66)
+        if not godcapture.enabled then return end
+
+        if v_u_3.TutorialStepsTaken.ClosedLabel.Value or not v_u_3.TutorialStepsTaken.TutorialStarted.Value then
+            v_u_24 = false
+            v_u_17 = BrickColor.new("White").Color
+            v_u_22 = true
+            if v_u_3.TutorialStepsTaken.ClosedLabel.Value and not v_u_3.TutorialStepsTaken.OpenedPaint.Value then
+                v_u_3.Events.ActivateTypeWriting:Fire("Next")
+            end
+            v_u_101 = p_u_66.Button1Down:Connect(function()
+                if v_u_17 then
+                    local v70 = 0
+
+                    if godcapture.clickspam then
+                        holdingm1 = true
+                        while holdingm1 do
+                            task.wait(0.1)
+
+                            task.spawn(function()
+                                pcall(function()
+                                    v_u_15:InvokeServer("PaintPart", {
+                                        ["Part"] = p_u_66.Target,
+                                        ["Color"] = v_u_17,
+                                        ["Mode"] = godcapture.restore and "Restore" or "Default",
+                                        ["CName"] = v_u_37,
+                                        ["Price"] = godcapture.price,
+                                        ["Free"] = godcapture.instacore and 0 or 0.001
+                                    })
+                                    v_u_12:Play()
+                                    v_u_12.PlaybackSpeed = 0.9 + math.random() * 0.1
+                                end)
+                            end)
+                        end
+                    end
+                end
+            end)
+            v_u_10 = p_u_66.Button1Up:Connect(function()
+                if v_u_17 then
+                    local v70 = 0
+                    holdingm1 = false
+                    pcall(function()
+                        v_u_15:InvokeServer("PaintPart", {
+                            ["Part"] = p_u_66.Target,
+                            ["Color"] = v_u_17,
+                            ["Mode"] = godcapture.restore and "Restore" or "Default",
+                            ["CName"] = v_u_37,
+                            ["Price"] = godcapture.price,
+                            ["Free"] = godcapture.instacore and 0 or 0.0001
+                        })
+                        v_u_12:Play()
+                        v_u_12.PlaybackSpeed = 0.9 + math.random() * 0.1
+                    end)
+                end
+            end)
+            p_u_66.Move:Connect(function()
+                if v_u_18 and not v_u_23 and v_u_24 == false then
+                    p_u_66.Icon = "rbxasset://textures\\FillCursor.png"
+                end
+            end)
+            v_u_19.FillColor = v_u_17
+            v_u_21.Color3 = v_u_17
+            v_u_2:BindToRenderStep("UpdateSelectionBox", Enum.RenderPriority.Input.Value, UpdateSelectionBox)
+            SetupGui()
+        else
+            v_u_7.Character:FindFirstChildWhichIsA("Humanoid"):UnequipTools()
+        end
+    end)
+    v_u_11.Unequipped:Connect(function()
+        if not godcapture.enabled then return end
+
+        if v_u_22 then
+            if v_u_10 then
+                v_u_10:Disconnect()
+            end
+            if v_u_101 then
+                v_u_101:Disconnect()
+            end
+            if v_u_3.TutorialStepsTaken.ReadThroughPaint.Value or not v_u_3.TutorialStepsTaken.TutorialStarted.Value then
+                v_u_22 = false
+                v_u_6:UnbindAction("Restore")
+                if v_u_18 then
+                    v_u_18:Destroy()
+                end
+                v_u_2:UnbindFromRenderStep("UpdateSelectionBox")
+                if v_u_19 then
+                    v_u_19.Adornee = nil
+                end
+                if v_u_21 then
+                    v_u_21.Adornee = nil
+                end
+                v_u_23 = false
+                v_u_18 = nil
+                v_u_8.Icon = ""
+                v_u_7.PlayerGui.PaintListUI.Enabled = false
+            else
+                v_u_7.Character:FindFirstChildWhichIsA("Humanoid"):EquipTool(v_u_11)
+            end
+        else
+            return
+        end
+    end)
+    function v16.OnClientInvoke(p74, p75)
+        if not godcapture.enabled then return end
+
+        if p74 == "AddProvince" then
+            local v76 = v_u_20
+            local v77 = p75.Part
+            table.insert(v76, v77)
+        elseif p74 == "RemoveProvince" then
+            table.remove(v_u_20, table.find(v_u_20, p75.Part))
+        end
+    end
+    v_u_2.Heartbeat:Connect(function()
+        if not godcapture.enabled then return end
+
+        if v_u_18 and v_u_11.Parent:IsA("Model") then
+            v_u_18.MouseInfo.Position = UDim2.new(0, v_u_8.X, 0, v_u_8.Y - 36)
+            local v_u_78 = v_u_8.Target
+            if v_u_78 and v_u_78:IsDescendantOf(workspace.Territories) then
+                local v_u_79 = { nil, 1000 }
+                for _, v80 in pairs(v_u_20) do
+                    if v80:GetAttribute("Core") then
+                        local v81 = (v80.Position - v_u_78.Position).Magnitude
+                        v_u_79 = v81 <= v_u_79[2] and { v80, v81 } or v_u_79
+                        if v_u_79[1] == nil then
+                            v_u_79 = { nil, 0 }
+                        end
+                    end
+                end
+                local v_u_82 = 0
+                v_u_26 = godcapture.price + (godcapture.instacore and 0 or 0.0001)
+                local v87 = v_u_3.CurrentCountries:FindFirstChild(v_u_78:GetAttribute("Current"))
+                if v87 then
+                    v_u_18.MouseInfo.NameInfo.Text = v87:GetAttribute("CustomName") or v_u_78:GetAttribute("Current")
+                else
+                    v_u_18.MouseInfo.NameInfo.Text = v_u_78:GetAttribute("Current")
+                end
+                if v_u_78:GetAttribute("Core") then
+                    local v88
+                    if v_u_78:GetAttribute("Core") == v_u_78:GetAttribute("Current") then
+                        v88 = ""
+                    else
+                        local v89 = v_u_78:GetAttribute("Cooldown")
+                        local v90 = v_u_78:GetAttribute("Current")
+                        v88 = " (" .. v89 .. "s) --> " .. v90
+                    end
+                    v_u_18.MouseInfo.XCoreInfo.Visible = true
+                    v_u_18.MouseInfo.XCoreInfo.Text = "Core: " .. v_u_78:GetAttribute("Core") .. v88
+                else
+                    v_u_18.MouseInfo.XCoreInfo.Visible = false
+                end
+                local v91 = 1
+                local v92 = 0
+                local v94 = v_u_8.Target:GetAttribute("Current") == game.Players.LocalPlayer.leaderstats.Country.Value and 0 
+                v_u_18.MouseInfo.CostInfo.Text = "Cost: " .. v_u_26
+                local v95 = "N/A"
+                v_u_18.MouseInfo.PLastInfo.Text = "Painted by: " .. v95
+                return
+            end
+            v_u_18.MouseInfo.NameInfo.Text = ""
+            v_u_18.MouseInfo.CostInfo.Text = ""
+            v_u_18.MouseInfo.PLastInfo.Text = ""
+            v_u_18.MouseInfo.XCoreInfo.Text = ""
+        end
+    end)
+    v_u_5.InputBegan:Connect(function(p96)
+        if not godcapture.enabled then return end
+
+        game:GetService("UserInputService"):GetMouseLocation()
+        if p96.KeyCode == Enum.KeyCode.E then
+            v_u_24 = not v_u_24
+        end
+    end)
+end
+
+--relations god--
+print("loading relations god")
+local function changerel(pl, tp, bo)
+    game.ReplicatedStorage.Events.ChangeRelations:FireServer(pl, tp, bo)
+end
+task.spawn(function()
+    while true do
+        task.wait(relgod.waitcd)
+        if relgod.enabled == false then
+            continue
+        end
+
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            changerel(plr, relgod.reltype, relgod.relbool)
+        end    
+    end
+end)
+
+--vote god--
+print("loading vote god")
+local function votegodhandler()
+    task.wait(0.5)
+    local eravoteui = game.Players.LocalPlayer.PlayerGui.VoteOptionUI
+    local mapvoteui = game.Players.LocalPlayer.PlayerGui.EraVoteUI
+
+    local mapchoose = nil
+
+    eravoteui.Accept.Activated:Connect(function()
+        if votegod.eracount > 0 then
+            for i=1, votegod.eracount do
+                game.ReplicatedStorage.Events.EraProposal:FireServer()
+                task.wait(0.05)
+            end
+        end
+    end)
+
+    mapvoteui.Main.Eras.ChildAdded:Connect(function(ch)
+        ch.Activated:Connect(function()
+            if mapchoose ~= nil then
+                if votegod.mapcount > 0 then
+                    for i=1, votegod.mapcount do
+                        game.ReplicatedStorage.Events.VoteForEra:FireServer(mapchoose, "Remove")
+                    end
+                end
+            end
+            if ch.Name == mapchoose then
+                mapchoose = nil
+                return
+            end
+
+            mapchoose = ch.Name
+
+            if votegod.mapcount > 0 then
+                for i=1, votegod.mapcount do
+                    game.ReplicatedStorage.Events.VoteForEra:FireServer(ch.Name, "Add")
+                end
+            end
+        end)
+    end)    
+end
+votegodhandler()
+
+
+--extra--
+print("extra")
+localplayer.CharacterAdded:Connect(function()
+    task.wait(0.1)
+
+    votegodhandler()
+
+    if not game.Players.LocalPlayer.Backpack:FindFirstChild("PaintBucket") then
+        scriptloading = true
+        game.CoreGui.PCR_1.Enabled = false
+
+        if godcapture.spawn ~= nil then
+            task.cancel(godcapture.spawn)
+        end
+
+        Notify("Ardour", "Waiting for country")
+        while not game.Players.LocalPlayer.Backpack:FindFirstChild("PaintBucket") do
+            task.wait(0.5)
+        end
+        
+        if godcapture.enabled then
+            game.Players.LocalPlayer.Backpack.PaintBucket.LocalScript.Enabled = false
+            godcapturefunc()
+        end
+
+        scriptloading = false
+        game.CoreGui.PCR_1.Enabled = true
+    end
+end)
+
+--gui--
+print("loading gui")
+local library = nil
+task.spawn(function()
+    local newlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/oShyyyyy/Plaguecheat.cc-Roblox-Ui-library/main/Source.lua", true))()
+
+    if library ~= nil then 
+        newlib.GUI:Destroy()
+        return 
+    end
+    library = newlib
+
+    if game.CoreGui:FindFirstChild("PCR_1") then
+        game.CoreGui.PCR_1.Enabled = false
+    end
+end)
+task.wait(2)
+while library == nil do
+    task.spawn(function()
+        local newlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/oShyyyyy/Plaguecheat.cc-Roblox-Ui-library/main/Source.lua", true))()
+
+        if library ~= nil then 
+            newlib.GUI:Destroy()
+            return 
+        end
+        library = newlib
+    
+        if game.CoreGui:FindFirstChild("PCR_1") then
+            game.CoreGui.PCR_1.Enabled = false
+        end
+    end)
+
+    task.wait(2)
+    if library == nil then
+        continue
+    end
+end
+game.CoreGui.PCR_1.Enabled = false
+do
+    local bg = game.CoreGui.PCR_1:FindFirstChild("BG", true)
+    if bg then 
+        Instance.new("UICorner", bg.Parent).CornerRadius = UDim.new(0.02, 0)
+    end
+end
+
+library:ChangeWeb("discord.gg/ardour")
+library:ChangeGame("World Roleplay")
+
+local general = library:AddWindow('General')
+local watermark = library:AddWatermark('Ardour Hub ')
+
+local main = general:AddSection('Main')
+local gcapt = general:AddSection('God Capture')
+local grel = general:AddSection('Relations God')
+local vgod = general:AddSection('Vote God')
+local misc = general:AddSection('Misc')
+
+
+main:AddLabel('The script version is "Zulu - 1"')
+main:AddKeyBind('Toggle GUI', Enum.KeyCode.Insert, function() 
+    if scriptloading then return end
+    game.CoreGui.PCR_1.Enabled = not game.CoreGui.PCR_1.Enabled
+end)
+main:AddButton('Kill 1 solara user', function() 
+    killsolara:Play()
+end)
+
+
+gcapt:AddToggle('Enabled', true, nil, function(v)
+    godcapture.enabled = v
+    if godcapture.enabled then
+        if game.Players.LocalPlayer.Character:FindFirstChild("PaintBucket") then
+            game.Players.LocalPlayer.Character.PaintBucket.Parent = game.Players.LocalPlayer.Backpack
+        end
+
+        game.Players.LocalPlayer.Backpack.PaintBucket.LocalScript.Enabled = false
+    else
+        if game.Players.LocalPlayer.Character:FindFirstChild("PaintBucket") then
+            game.Players.LocalPlayer.Character.PaintBucket.Parent = game.Players.LocalPlayer.Backpack
+        end
+
+        game.Players.LocalPlayer.Backpack.PaintBucket.LocalScript.Enabled = true
+    end
+end)
+gcapt:AddToggle('Restore mode', true, nil, function(v)
+    godcapture.restore = v
+end)
+gcapt:AddToggle('InstaCore', false, nil, function(v)
+    godcapture.instacore = v
+end)
+gcapt:AddToggle('Click spam', true, nil, function(v)
+    godcapture.clickspam = v
+end)
+gcapt:AddSlider('Price', 15, 0, 0, function(c) 
+    godcapture.price = c
+end)
+
+
+grel:AddToggle('Enabled', true, nil, function(v)
+    relgod.enabled = v
+end)
+grel:AddSeparateBar()
+grel:AddToggle('Target mode', true, nil, function(v)
+    relgod.onlytarget = v
+end)
+grel:AddTextBox('Target name', nil, false, 5, function(plrname) 
+    if game.Players:FindFirstChild(plrname) then
+        relgod.targetplr = plrname
+        Notify("Ardour", "Changed target")
+    else
+        relgod.targetplr = nil
+    end
+end)
+grel:AddSeparateBar()
+grel:AddDropdown('Relation type', {'Peace'}, 'Peace', function(a)
+    relgod.reltype = a
+end)
+grel:AddToggle('Relation bool', false, nil, function(v)
+    relgod.relbool = v
+end)
+grel:AddSeparateBar()
+grel:AddSlider('Wait CD', 4, 0.1, 0.5, function(c) 
+    relgod.waitcd = c
+end)
+grel:AddButton('Activate once', function() 
+    if relgod.onlytarget == false then
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            changerel(plr, relgod.reltype, relgod.relbool)
+        end  
+    elseif relgod.targetplr ~= nil then
+        local pl = game.Players:FindFirstChild(relgod.targetplr)
+        if not plr then return end
+
+        changerel(pl, relgod.reltype, relgod.relbool)
+    end
+end)
+
+
+vgod:AddSlider('Era accept boost', 20, 0, 0, function(c) 
+    votegod.eracount = c
+end)
+vgod:AddSlider('Map vote boost', 20, 0, 0, function(c) 
+    votegod.mapcount = c
+end)
+
+
+if not game.Players.LocalPlayer.Backpack:FindFirstChild("PaintBucket") then
+    Notify("Ardour", "Waiting for country")
+    while not game.Players.LocalPlayer.Backpack:FindFirstChild("PaintBucket") do
+        task.wait(0.5)
+    end
+end
+
+godcapturefunc()
+
+--loaded--
+scriptloading = false
+print("loaded")
+Notify("Ardour", "Script loaded")
+game.CoreGui.PCR_1.Enabled = not game.CoreGui.PCR_1.Enabled
